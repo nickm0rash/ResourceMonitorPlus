@@ -1,0 +1,1 @@
+//ConfigManager.cpp : Manages application settings and configuration.

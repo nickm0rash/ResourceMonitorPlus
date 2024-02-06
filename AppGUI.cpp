@@ -1,0 +1,1 @@
+//AppGUI.cpp : Handles all GUI-related functionalities.
