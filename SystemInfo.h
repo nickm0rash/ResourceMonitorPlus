@@ -6,8 +6,6 @@
 #include <mutex>
 #include <future>
 #include <atomic>
-#include <Winsock2.h>
-#include <WS2tcpip.h>
 
 class SystemInfo {
 public:
@@ -22,8 +20,6 @@ public:
 	double GetDiskWriteUsage() const;
 	double GetNetworkSentUsage() const;
 	double GetNetworkReceivedUsage() const;
-	std::string GetLocalIPv4Address() const;
-	std::string GetLocalIPv6Address() const;
 	std::vector<std::string> GetRunningProcesses() const;
 
 	void PrintRunningProcesses(); //Print running processes to console DEBUG.
@@ -47,7 +43,4 @@ private:
 	std::atomic<double> m_networkSentUsage;
 	std::atomic<double> m_networkReceivedUsage;
 	std::vector<std::string> m_runningProcesses;
-	std::vector<std::string> localIPv4Address;
-	std::vector<std::string> localIPv6Address;
-
 };

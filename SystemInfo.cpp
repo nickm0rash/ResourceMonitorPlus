@@ -2,8 +2,6 @@
 
 #include "SystemInfo.h"
 #include <Pdh.h>
-#include <Winsock2.h>
-#include <WS2tcpip.h>
 #include <Windows.h>
 #include <TlHelp32.h>
 #include <vector>
@@ -105,62 +103,6 @@ double SystemInfo::GetNetworkReceivedUsage() const {
 std::vector<std::string> SystemInfo::GetRunningProcesses() const {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_runningProcesses;
-}
-
-std::string SystemInfo::GetLocalIPv4Address() const {
-    WSADATA wsaData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        return "0.0.0.0";
-    }
-
-    ADDRINFO hints{}, * result = nullptr;
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET; // IPv4 addresses only
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-
-    if (getaddrinfo(nullptr, nullptr, &hints, &result) != 0) {
-        WSACleanup();
-        return "0.0.0.0";
-    }
-
-    char ipStr[INET_ADDRSTRLEN];
-    for (ADDRINFO* ptr = result; ptr != nullptr; ptr = ptr->ai_next) {
-        inet_ntop(AF_INET, &reinterpret_cast<sockaddr_in*>(ptr->ai_addr)->sin_addr, ipStr, sizeof(ipStr));
-        break; // TODO: Pick LAN address, not first address.
-    }
-
-    freeaddrinfo(result);
-    WSACleanup();
-    return ipStr;
-}
-
-	
-std::string SystemInfo::GetLocalIPv6Address() const {
-	WSADATA wsaData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        return "0.0.0.0";
-    }
-
-    ADDRINFO hints{}, * result = nullptr;
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET6; // IPv6 addresses only
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-
-    if (getaddrinfo(nullptr, nullptr, &hints, &result) != 0) {
-		WSACleanup();
-        return "0.0.0.0";
-    }
-
-    char ipStr[INET6_ADDRSTRLEN];
-    for (ADDRINFO* ptr = result; ptr != nullptr; ptr = ptr->ai_next) {
-		inet_ntop(AF_INET6, &reinterpret_cast<sockaddr_in6*>(ptr->ai_addr)->sin6_addr, ipStr, sizeof(ipStr));
-		break; // TODO: Pick LAN address, not first address.
-	}
-    freeaddrinfo(result);
-    WSACleanup();
-    return ipStr;
 }
 
 //Update for each metric.

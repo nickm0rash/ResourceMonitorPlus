@@ -4,6 +4,7 @@
 #include "framework.h"
 #include "ResourceMonitorPlus.h"
 #include "SystemInfo.h"
+#include "NetworkInfo.h"
 #include <string>
 #include <sstream>
 
@@ -16,15 +17,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
 
 SystemInfo si;
-
-std::wstring ConvertToWideString(const std::string& input) {
-    std::wstring wideString;
-    wideString.reserve(input.length());
-    for (char c : input) {
-        wideString.push_back(static_cast<wchar_t>(c));
-    }
-    return wideString;
-}
+NetworkInfo net;
 
 
 // Forward declarations of functions included in this code module:
@@ -41,8 +34,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    // TODO: Place code here.
-    //si.PrintRunningProcesses();
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -178,15 +169,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 L"Memory Usage: " + std::to_wstring(si.GetMemoryUsage()) + L"%\n" +
                 L"Disk Read: " + std::to_wstring(si.GetDiskReadUsage()) + L" bytes/sec\n" +
                 L"Disk Write: " + std::to_wstring(si.GetDiskWriteUsage()) + L" bytes/sec\n" +
-                //TODO: Display IP info here.
+                L"Local IPv4 Address: " + net.GetLocalIPAddress(false) + L"\n" +
+                L"Local IPv6 Address: " + net.GetLocalIPAddress(true) + L"\n" + //true indicates AF_INET6
                 L"Network Sent: " + std::to_wstring(si.GetNetworkSentUsage()) + L" bytes/sec\n" +
                 L"Network Received: " + std::to_wstring(si.GetNetworkReceivedUsage()) + L" bytes/sec\n" +
                 L"Running Processes: ";
             std::vector<std::string> processes = si.GetRunningProcesses();
-            std::wstring ipInfo =
-                L"Local IPv4: " + ConvertToWideString(si.GetLocalIPv4Address()) + L"\n" +
-                L"Local IPv6: " + ConvertToWideString(si.GetLocalIPv6Address()) + L"\n";
-            ss += ipInfo;
 
             for (auto& process : processes) {
 				ss += std::wstring(process.begin(), process.end()) + L", ";
