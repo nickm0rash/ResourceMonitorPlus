@@ -1,5 +1,3 @@
-# ResourceMonitorPlus
-
 Resource Monitor Plus
 =====================
 
