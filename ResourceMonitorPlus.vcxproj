@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AppGUI.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="NetworkInfo.h" />
     <ClInclude Include="Resource.h" />

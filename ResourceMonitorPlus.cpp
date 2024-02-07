@@ -3,6 +3,7 @@
 
 #include "framework.h"
 #include "ResourceMonitorPlus.h"
+#include "AppGUI.h"
 #include "SystemInfo.h"
 #include "NetworkInfo.h"
 #include <string>
@@ -15,9 +16,10 @@ HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
-
+//Global instances of helper classes.
 SystemInfo si;
 NetworkInfo net;
+AppGUI gui;
 
 
 // Forward declarations of functions included in this code module:
@@ -164,6 +166,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
             si.UpdateMetricsAsync();
+
+            // Drawing DEBUG for now, will be handled by AppGUI class in the future.
             std::wstring ss = 
                 L"CPU Usage: " + std::to_wstring(si.GetCpuUsage()) + L"%\n" +
                 L"Memory Usage: " + std::to_wstring(si.GetMemoryUsage()) + L"%\n" +
@@ -171,38 +175,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 L"Disk Write: " + std::to_wstring(si.GetDiskWriteUsage()) + L" bytes/sec\n" +
                 L"Local IPv4 Address: " + net.GetLocalIPAddress(false) + L"\n" +
                 L"Local IPv6 Address: " + net.GetLocalIPAddress(true) + L"\n" + //true indicates AF_INET6
+                L"Public IPv4 Address: " + net.GetPublicIPAddress() + L"\n" +
                 L"Network Sent: " + std::to_wstring(si.GetNetworkSentUsage()) + L" bytes/sec\n" +
-                L"Network Received: " + std::to_wstring(si.GetNetworkReceivedUsage()) + L" bytes/sec\n" +
-                L"Running Processes: ";
-            std::vector<std::string> processes = si.GetRunningProcesses();
+                L"Network Received: " + std::to_wstring(si.GetNetworkReceivedUsage()) + L" bytes/sec\n";
 
-            for (auto& process : processes) {
-				ss += std::wstring(process.begin(), process.end()) + L", ";
-			}
-            DrawText(
-                hdc, 
-                ss.c_str(), 
-                ss.length(), 
-                &ps.rcPaint, 
-                DT_LEFT | 
-                DT_TOP | 
-                DT_WORDBREAK | 
-                DT_NOCLIP | 
-                DT_EXPANDTABS | 
-                DT_EXTERNALLEADING | 
-                DT_CALCRECT | 
-                DT_NOPREFIX | 
-                DT_EDITCONTROL | 
-                DT_END_ELLIPSIS | 
-                DT_PATH_ELLIPSIS | 
-                DT_MODIFYSTRING | 
-                DT_RTLREADING | 
-                DT_WORD_ELLIPSIS | 
-                DT_NOFULLWIDTHCHARBREAK | 
-                DT_HIDEPREFIX | 
-                DT_PREFIXONLY | 
-                DT_TABSTOP
-            );
+            // Get the number of running processes
+            std::vector<std::string> processes = si.GetRunningProcesses();
+            ss += L"Running Processes: " + std::to_wstring(processes.size()) + L"\n"; // Output number of processes
+
+            // Draw the text
+            DrawText(hdc, ss.c_str(), -1, &ps.rcPaint, DT_LEFT | DT_TOP | DT_WORDBREAK);
             EndPaint(hWnd, &ps);
         }
         break;
